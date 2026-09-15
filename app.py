@@ -5,7 +5,10 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-client = Anthropic()
+
+api_key = st.secrets.get("ANTHROPIC_API_KEY") if "ANTHROPIC_API_KEY" in st.secrets else os.getenv("ANTHROPIC_API_KEY")
+
+client = Anthropic(api_key=api_key)
 
 st.title("Permit & Regulatory PDF Analyzer")
 
