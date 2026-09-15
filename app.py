@@ -36,7 +36,7 @@ if uploaded_file is not None:
         
         # Send extracted text to Anthropic API
         response = client.messages.create(
-            model="claude-3-5-sonnet-latest",
+            model="claude-sonnet-5",
             max_tokens=1000,
             messages=[{
                 "role": "user",
