@@ -1,11 +1,11 @@
-import streamlit as st
-import pdfplumber
-from anthropic import Anthropic
 import os
+import streamlit as st
+from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# Safely pull the API key from Streamlit secrets or local .env
 api_key = st.secrets.get("ANTHROPIC_API_KEY") if "ANTHROPIC_API_KEY" in st.secrets else os.getenv("ANTHROPIC_API_KEY")
 
 client = Anthropic(api_key=api_key)
@@ -16,7 +16,6 @@ uploaded_file = st.file_uploader("Upload a regulatory PDF", type="pdf")
 
 if uploaded_file is not None:
     with st.spinner("Extracting text and analyzing with Claude..."):
-        # 1. Extract text from the uploaded file object
         full_text = ""
         with pdfplumber.open(uploaded_file) as pdf:
             for page in pdf.pages:
@@ -24,10 +23,8 @@ if uploaded_file is not None:
                 if text:
                     full_text += text + "\n"
         
-        # 2. Send the extracted text to the Anthropic API
-        # (Replace this with your actual prompt and model call from stage2.py)
         response = client.messages.create(
-            model="claude-sonnet-5",
+            model="claude-3-5-sonnet-latest",  # Use a valid model name here
             max_tokens=1000,
             messages=[{
                 "role": "user",
@@ -35,7 +32,6 @@ if uploaded_file is not None:
             }]
         )
         
-        # 3. Display the result in the UI
-        st.subheader("Analysis Result")
         text_output = next((block.text for block in response.content if block.type == "text"), "No text found.")
-st.write(text_output)
+        st.subheader("Analysis Result")
+        st.write(text_output)
