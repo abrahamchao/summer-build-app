@@ -24,37 +24,37 @@ type ExtractedPdfResult = {
 
 type AppSupabaseClient = SupabaseClient<any, "public", any>;
 
-function loadRootEnv() {
-  const envPath = resolve(process.cwd(), "..", ".env");
-  if (!existsSync(envPath)) {
-    return;
-  }
+// function loadRootEnv() {
+//   const envPath = resolve(process.cwd(), "..", ".env");
+//   if (!existsSync(envPath)) {
+//     return;
+//   }
 
-  for (const rawLine of readFileSync(envPath, "utf8").split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) {
-      continue;
-    }
+//   for (const rawLine of readFileSync(envPath, "utf8").split(/\r?\n/)) {
+//     const line = rawLine.trim();
+//     if (!line || line.startsWith("#")) {
+//       continue;
+//     }
 
-    const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (!match) {
-      continue;
-    }
+//     const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+//     if (!match) {
+//       continue;
+//     }
 
-    const key = match[1];
-    let value = match[2].trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
+//     const key = match[1];
+//     let value = match[2].trim();
+//     if (
+//       (value.startsWith('"') && value.endsWith('"')) ||
+//       (value.startsWith("'") && value.endsWith("'"))
+//     ) {
+//       value = value.slice(1, -1);
+//     }
 
-    if (!process.env[key]) {
-      process.env[key] = value;
-    }
-  }
-}
+//     if (!process.env[key]) {
+//       process.env[key] = value;
+//     }
+//   }
+// }
 
 function env(name: string) {
   return process.env[name]?.trim() ?? "";
@@ -195,7 +195,7 @@ async function extractOnePdf(
 
 export async function POST(request: Request) {
   try {
-    loadRootEnv();
+    // loadRootEnv();
 
     const supabaseUrl = env("SUPABASE_URL");
     const supabaseKey = env("SUPABASE_KEY");
