@@ -155,6 +155,9 @@ function FieldTable({ fields }) {
   );
 }
 
+/**
+ * @param {{ data?: Record<string, unknown>[] }} props
+ */
 export default function ExtractionTable({ data = [] }) {
   const rows = Array.isArray(data) ? data : [];
 

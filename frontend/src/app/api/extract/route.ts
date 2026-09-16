@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { extractText, getDocumentProxy } from "unpdf";
@@ -10,6 +10,19 @@ export const maxDuration = 60;
 
 const PERMIT_TABLE = "permit summaries";
 const MAX_TEXT_CHARS = 120_000;
+
+type PermitInsert = {
+  file_name: string;
+  extracted_data: unknown;
+};
+
+type ExtractedPdfResult = {
+  file_name: string;
+  extracted_data: unknown;
+  saved: boolean;
+};
+
+type AppSupabaseClient = SupabaseClient<any, "public", any>;
 
 function loadRootEnv() {
   const envPath = resolve(process.cwd(), "..", ".env");
@@ -145,8 +158,8 @@ async function analyzeWithAnthropic(
 async function extractOnePdf(
   file: File,
   anthropic: Anthropic,
-  supabase: ReturnType<typeof createClient>,
-) {
+  supabase: AppSupabaseClient,
+): Promise<ExtractedPdfResult> {
   if (!isPdfFile(file)) {
     throw new Error(`${file.name} is not a PDF.`);
   }
@@ -160,10 +173,14 @@ async function extractOnePdf(
     text,
   );
 
-  const { error } = await supabase.from(PERMIT_TABLE).insert({
-    file_name: file.name,
-    extracted_data: extractedData,
-  });
+  const records: PermitInsert[] = [
+    {
+      file_name: file.name,
+      extracted_data: extractedData,
+    },
+  ];
+
+  const { error } = await supabase.from(PERMIT_TABLE).insert(records);
 
   if (error) {
     throw new Error(`Failed to save to Supabase: ${error.message}`);
@@ -207,8 +224,11 @@ export async function POST(request: Request) {
     }
 
     const anthropic = new Anthropic({ apiKey: anthropicKey });
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const results = [];
+    const supabase = createClient(
+      supabaseUrl,
+      supabaseKey,
+    ) as AppSupabaseClient;
+    const results: ExtractedPdfResult[] = [];
 
     for (const file of files) {
       results.push(await extractOnePdf(file, anthropic, supabase));
