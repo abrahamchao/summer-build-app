@@ -197,12 +197,12 @@ export async function POST(request: Request) {
   try {
     // loadRootEnv();
 
-    const supabaseUrl = env("SUPABASE_URL");
-    const supabaseKey = env("SUPABASE_KEY");
+    const supabaseUrl = env("NEXT_PUBLIC_SUPABASE_URL");
+    const supabaseKey = env("NEXT_PUBLIC_SUPABASE_ANON_KEY");
     const anthropicKey = env("ANTHROPIC_API_KEY");
 
     if (!supabaseUrl || !supabaseKey) {
-      return jsonError("Missing SUPABASE_URL or SUPABASE_KEY.", 500);
+      return jsonError("Missing NEXt_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.", 500);
     }
     if (!anthropicKey) {
       return jsonError("Missing ANTHROPIC_API_KEY.", 500);
